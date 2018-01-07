@@ -1,6 +1,9 @@
 defmodule KuberaWeb.ErrorView do
   use KuberaWeb, :view
 
+  alias KuberaWeb.ErrorView
+  import Plug.Conn
+
   def render("400.json", _assigns) do
     build_response("Bad Request", 400)
   end
@@ -29,6 +32,10 @@ defmodule KuberaWeb.ErrorView do
   # template is found, let's render it as 500
   def template_not_found(_template, assigns) do
     render "500.json", assigns
+  end
+
+  def send_error(conn, status) do
+    conn |> put_status(status) |> Phoenix.Controller.render(ErrorView, to_string(status) <> ".json")
   end
 
   defp build_response(message, code), do: %{title: message, code: code}

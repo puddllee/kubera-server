@@ -6,7 +6,7 @@ defmodule KuberaWeb.AuthController do
   alias Kubera.Repo
 
   alias Ueberauth.Strategy.Helpers
-  alias KuberaWeb.ErrorView
+  import KuberaWeb.ErrorView
 
   plug Ueberauth
   plug :scrub_params, "user" when action in [:sign_in_user]
@@ -15,7 +15,7 @@ defmodule KuberaWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
-    conn |> render(ErrorView, "401.json")
+    send_error(conn, 401)
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
@@ -24,7 +24,7 @@ defmodule KuberaWeb.AuthController do
         sign_in_user(conn, %{"user" => user})
       {:error, reason} ->
         IO.inspect reason
-        conn |> render(ErrorView, "401.json")
+        send_error(conn, 401)
     end
   end
 
@@ -62,34 +62,24 @@ defmodule KuberaWeb.AuthController do
         |> put_resp_header("authorization", "Bearer #{jwt}")
         |> json(%{access_token: jwt})
       {:error, _} ->
-        conn
-        |> put_status(422)
-        |> render(ErrorView, "422.json")
+        send_error(conn, 422)
     end
   end
 
   def unauthenticated(conn, _params) do
-    conn
-    |> put_status(401)
-    |> render(ErrorView, "401.json")
+    send_error(conn, 401)
   end
 
   def unauthorized(conn, _params) do
-    conn
-    |> put_status(403)
-    |> render(ErrorView, "403.json")
+    send_error(conn, 403)
   end
 
   def already_authenticated(conn, _params) do
-    conn
-    |> put_status(200)
-    |> render(ErrorView, "200.json")
+    send_error(conn, 200)
   end
 
   def no_resource(conn, _params) do
-    conn
-    |> put_status(404)
-    |> render(ErrorView, "404.json")
+    send_error(conn, 404)
   end
 
 end
