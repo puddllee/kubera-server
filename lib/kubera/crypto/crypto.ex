@@ -7,6 +7,7 @@ defmodule Kubera.Crypto do
   alias Kubera.Repo
 
   alias Kubera.Crypto.Coin
+  alias Kubera.Crypto.Api
 
   @doc """
   Returns the list of coins.
@@ -109,5 +110,10 @@ defmodule Kubera.Crypto do
   """
   def change_coin(%Coin{} = coin) do
     Coin.changeset(coin, %{})
+  end
+
+  def save_coinlist do
+    Api.fetch_coinlist
+    |> Enum.map(&upsert_coin/1)
   end
 end

@@ -20,7 +20,7 @@ defmodule Kubera.Mixfile do
   def application do
     [
       mod: {Kubera.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison]
+      extra_applications: [:logger, :runtime_tools, :timex, :httpoison]
     ]
   end
 

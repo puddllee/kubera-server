@@ -19,7 +19,7 @@ config :kubera, KuberaWeb.Endpoint,
 
 config :kubera, Kubera.Crypto.Scheduler,
   jobs: [
-    {"*/15 * * * *", {Kubera.Crypto.Api, :save_coinlist, []}}
+    {"*/15 * * * *", {Kubera.Crypto, :save_coinlist, []}}
   ]
 
 # Configures Elixir's Logger

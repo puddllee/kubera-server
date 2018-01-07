@@ -18,5 +18,6 @@ defmodule Kubera.Crypto.Coin do
     coin
     |> cast(attrs, [:name, :symbol, :image, :rank])
     |> validate_required([:name, :symbol, :image, :rank])
+    |> unique_constraint(:symbol)
   end
 end
