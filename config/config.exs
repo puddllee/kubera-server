@@ -42,7 +42,7 @@ config :ueberauth, Ueberauth.Strategy.Google.OAuth,
   redirect_uri: System.get_env("GOOGLE_CALLBACK_URL"),
   callback_url: System.get_env("GOOGLE_CALLBACK_URL")
 
-config :guardian, Guardian,
+config :kubera, Kubera.Guardian,
   allowed_algos: ["HS512"],
   verify_module: Guardian.JWT,
   issuer: "Kubera",
@@ -50,7 +50,12 @@ config :guardian, Guardian,
   allowed_drift: 2000,
   verify_issuer: true,
   secret_key: System.get_env("GUARDIAN_SECRET") || "rFtDNsugNi8jNJLOfvcN4jVyS/V7Sh+9pBtc/J30W8h4MYTcbiLYf/8CEVfdgU6/",
-  serializer: Kubera.GuardianSerializer
+  serializer: Kubera.Guardian
+
+
+config :kubera, KuberaWeb.Plugs.AuthAccessPipeline,
+  module: Kubera.Guardian,
+  error_handler: KuberaWeb.AuthController
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

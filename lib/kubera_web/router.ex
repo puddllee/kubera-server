@@ -1,23 +1,14 @@
 defmodule KuberaWeb.Router do
   use KuberaWeb, :router
 
-  import KuberaWeb.Plugs.UserPlug
+  alias KuberaWeb.Plugs
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  pipeline :api_auth do
-    plug :accepts, ["json"]
-    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
-    plug Guardian.Plug.EnsureAuthenticated, handler: KuberaWeb.AuthController
-    plug Guardian.Plug.LoadResource
-    plug Guardian.Plug.EnsureResource, handler: KuberaWeb.AuthController
-    plug :load_user
-  end
-
   scope "/api/v1", KuberaWeb do
-    pipe_through :api_auth
+    pipe_through [:api, Plugs.AuthAccessPipeline]
 
     resources "/users", UserController, except: [:new, :edit]
     get "/profile", UserController, :show

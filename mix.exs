@@ -40,7 +40,7 @@ defmodule Kubera.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:ja_serializer, "~> 0.12.0"},
-      {:guardian, "~> 0.14.2"},
+      {:guardian, "~> 1.0"},
       {:ueberauth, "~> 0.4"},
       {:ueberauth_google, "~> 0.5"},
       {:comeonin, "~> 3.2"},

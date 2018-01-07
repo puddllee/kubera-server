@@ -9,7 +9,6 @@ defmodule KuberaWeb.AuthController do
   import KuberaWeb.ErrorView
 
   plug Ueberauth
-  plug :scrub_params, "user" when action in [:sign_in_user]
 
   def request(_conn, _params) do
   end
@@ -31,11 +30,12 @@ defmodule KuberaWeb.AuthController do
   def sign_in_user(conn, %{"user" => user}) do
     # Attemp to retrieve exactly one user from the DB,
     # whose email matches the one provided with the login request
+    IO.inspect user
     case Repo.get_by(User, email: user.email) do
       %User{} = user ->
-        {:ok, jwt, _} = Guardian.encode_and_sign(user, :token)
+        {:ok, jwt, _} = Kubera.Guardian.encode_and_sign(user)
 
-        auth_conn = Guardian.Plug.api_sign_in(conn, user)
+        auth_conn = Kubera.Guardian.Plug.sign_in(conn, user)
         auth_conn
         |> put_resp_header("authorization", "Bearer #{jwt}")
         |> json(%{access_token: jwt}) # Return token to client
@@ -56,7 +56,7 @@ defmodule KuberaWeb.AuthController do
 
     case Repo.insert changeset do
       {:ok, user} ->
-        {:ok, jwt, _} = Guardian.encode_and_sign(user, :token)
+        {:ok, jwt, _} = Kubera.Guardian.encode_and_sign(user)
 
         conn
         |> put_resp_header("authorization", "Bearer #{jwt}")
@@ -79,7 +79,11 @@ defmodule KuberaWeb.AuthController do
   end
 
   def no_resource(conn, _params) do
-    send_error(conn, 404)
+    send_error(conn, 401)
   end
 
+  def auth_error(conn, {_type, _reason}, _opts) do
+    conn
+    |> send_error(401)
+  end
 end
