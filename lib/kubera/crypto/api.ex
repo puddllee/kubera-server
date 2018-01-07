@@ -20,7 +20,8 @@ defmodule Kubera.Crypto.Api do
         |> Enum.map(fn c ->
           %{ image: "#{"https://www.cryptocompare.com"}#{Map.get(c, "ImageUrl")}",
              name: Map.get(c, "CoinName"),
-             symbol: Map.get(c, "Symbol")}
+             symbol: Map.get(c, "Symbol"),
+             rank: Map.get(c, "SortOrder")}
         end)
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason

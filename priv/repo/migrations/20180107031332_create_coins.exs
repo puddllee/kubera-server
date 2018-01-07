@@ -6,6 +6,7 @@ defmodule Kubera.Repo.Migrations.CreateCoins do
       add :name, :string
       add :symbol, :string
       add :image, :string
+      add :rank, :integer
 
       timestamps()
     end

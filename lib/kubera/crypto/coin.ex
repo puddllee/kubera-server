@@ -8,6 +8,7 @@ defmodule Kubera.Crypto.Coin do
     field :image, :string
     field :name, :string
     field :symbol, :string
+    field :rank, :integer
 
     timestamps()
   end
@@ -15,7 +16,7 @@ defmodule Kubera.Crypto.Coin do
   @doc false
   def changeset(%Coin{} = coin, attrs) do
     coin
-    |> cast(attrs, [:name, :symbol, :image])
-    |> validate_required([:name, :symbol, :image])
+    |> cast(attrs, [:name, :symbol, :image, :rank])
+    |> validate_required([:name, :symbol, :image, :rank])
   end
 end

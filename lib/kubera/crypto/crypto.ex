@@ -18,7 +18,8 @@ defmodule Kubera.Crypto do
 
   """
   def list_coins do
-    Repo.all(Coin)
+    from c in Coin,
+    order_by: c.rank
   end
 
   @doc """
