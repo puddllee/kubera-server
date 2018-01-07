@@ -20,6 +20,7 @@ defmodule KuberaWeb.Router do
     pipe_through :api_auth
 
     resources "/users", UserController, except: [:new, :edit]
+    get "/profile", UserController, :show
     get "/coins", CoinController, :index
   end
 

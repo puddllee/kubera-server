@@ -11,9 +11,8 @@ defmodule KuberaWeb.UserController do
     render(conn, "index.json", users: users)
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    render(conn, "show.json", user: user)
+  def show(conn, _params) do
+    render(conn, "show.json", user: conn.assigns.user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
