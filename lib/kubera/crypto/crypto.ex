@@ -116,4 +116,8 @@ defmodule Kubera.Crypto do
     Api.fetch_coinlist
     |> Enum.map(&upsert_coin/1)
   end
+
+  def fetch_coin(freq, symbol, opts \\ []) do
+    Api.fetch_coin(freq, symbol, opts)
+  end
 end

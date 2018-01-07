@@ -10,10 +10,15 @@ defmodule KuberaWeb.CoinView do
     render_one(coin, CoinView, "coin.json")
   end
 
+  def render("price.json", %{symbol: symbol, data: data}) do
+    %{symbol: symbol, data: data}
+  end
+
   def render("coin.json", %{coin: coin}) do
     %{id: coin.id,
       name: coin.name,
       symbol: coin.symbol,
       image: coin.image}
   end
+
 end

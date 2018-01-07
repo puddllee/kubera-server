@@ -5,6 +5,8 @@ defmodule Kubera.Crypto.Api do
   @base "https://min-api.cryptocompare.com/data/"
   @coinlist "all/coinlist"
   @histominute "histominute"
+  @histohour "histohour"
+  @histoday "histoday"
 
   def fetch_coinlist do
     case HTTPoison.get(@base <> @coinlist) do
@@ -25,18 +27,18 @@ defmodule Kubera.Crypto.Api do
     end
   end
 
-  def fetch_coin(symbol, from_date), do: fetch_coin(symbol, "USD", from_date)
-  def fetch_coin(symbol, to_symbol, from_date) do
-    params = [
-      {"fsym", symbol}, # from symbol
-      {"tsym", to_symbol}, # to symbol
-      {"limit", 2000},
-      {"e", "CCCAGG"}, # exchange
-      {"allData", "true"},
-      {"toTs", to_string(from_date)}
-    ]
-    IO.inspect params
-    case HTTPoison.get(@base <> @histominute, [], params: params) do
+  def fetch_coin(freq, symbol, opts \\ []) do
+    opts = Keyword.merge([
+      "tsym": "USD",
+      "limit": 2000,
+      "e": "CCCAGG",
+      "aggregate": "2",
+      "fsym": symbol
+    ], opts)
+    params = Keyword.keys(opts)
+    |> Enum.map(fn k -> {k, Keyword.get(opts, k)} end)
+
+    case HTTPoison.get(@base <> freq, [], params: params) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         decoded = Poison.decode!(body)
         Map.get(decoded, "Data")
