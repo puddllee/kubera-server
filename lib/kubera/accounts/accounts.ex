@@ -148,18 +148,24 @@ defmodule Kubera.Accounts do
 
   """
   def create_group(user, attrs \\ %{}) do
+    uid = Hashids.new([min_len: 3])
+    |> Hashids.encode(:rand.uniform(10000000))
+
     pgroup = %Group{}
-    |> Group.changeset(attrs)
+    |> Group.changeset(Map.put(attrs, "uid", uid))
     |> Repo.insert()
 
      case pgroup do
        {:ok, group} ->
          group = group |> Repo.preload(:users)
 
+         user = Repo.preload(user, :groups)
+         groups = user.groups ++ [group]
+         |> Enum.map(&Ecto.Changeset.change/1)
+
          user
-         |> Repo.preload(:groups)
-         |> change_user()
-         |> Ecto.Changeset.put_assoc(:groups, [group])
+         |> Ecto.Changeset.change
+         |> Ecto.Changeset.put_assoc(:groups, groups)
          |> Repo.update!()
 
          {:ok, group}

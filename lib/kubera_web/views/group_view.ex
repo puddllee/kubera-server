@@ -13,6 +13,7 @@ defmodule KuberaWeb.GroupView do
   def render("group.json", %{group: group}) do
     %{id: group.id,
       name: group.name,
+      uid: group.uid,
       buyin: group.buyin,
       joinable: group.joinable}
   end
