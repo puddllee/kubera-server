@@ -13,7 +13,7 @@ defmodule KuberaWeb.Router do
     resources "/users", UserController, except: [:new, :edit]
     get "/profile", UserController, :show
     get "/coins", CoinController, :index
-    get "/coins/:symbol/price", CoinController, :price
+    get "/coins/:symbol/hist", CoinController, :price
   end
 
   scope "/api/v1/auth", KuberaWeb do
