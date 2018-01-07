@@ -11,6 +11,7 @@ defmodule KuberaWeb.Router do
     pipe_through [:api, Plugs.AuthAccessPipeline]
 
     resources "/users", UserController, except: [:new, :edit]
+    resources "/groups", GroupController, except: [:new, :edit]
     get "/profile", UserController, :show
     get "/coins", CoinController, :index
     get "/coins/:symbol/hist", CoinController, :price

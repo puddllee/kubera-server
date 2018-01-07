@@ -12,6 +12,7 @@ defmodule Kubera.Accounts.User do
     field :name, :string
     field :email, :string
 
+    many_to_many :groups, Kubera.Accounts.Group, join_through: "users_groups"
     timestamps()
   end
 

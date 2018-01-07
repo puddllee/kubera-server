@@ -16,6 +16,7 @@ defmodule KuberaWeb.UserView do
       auth_provider: user.auth_provider,
       first_name: user.first_name,
       last_name: user.last_name,
-      avatar: user.avatar}
+      avatar: user.avatar,
+      groups: render_many(user.groups, KuberaWeb.GroupView, "group.json")}
   end
 end

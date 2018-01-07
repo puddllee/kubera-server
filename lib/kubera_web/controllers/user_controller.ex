@@ -12,7 +12,7 @@ defmodule KuberaWeb.UserController do
   end
 
   def show(conn, _params) do
-    render(conn, "show.json", user: conn.assigns.user)
+    render(conn, "show.json", user: Accounts.load_groups(conn.assigns.user))
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
