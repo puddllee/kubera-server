@@ -4,9 +4,9 @@ defmodule KuberaWeb.CoinControllerTest do
   alias Kubera.Crypto
   alias Kubera.Crypto.Coin
 
-  @create_attrs %{name: "some name"}
-  @update_attrs %{name: "some updated name"}
-  @invalid_attrs %{name: nil}
+  @create_attrs %{image: "some image", name: "some name", symbol: "some symbol"}
+  @update_attrs %{image: "some updated image", name: "some updated name", symbol: "some updated symbol"}
+  @invalid_attrs %{image: nil, name: nil, symbol: nil}
 
   def fixture(:coin) do
     {:ok, coin} = Crypto.create_coin(@create_attrs)
@@ -32,7 +32,9 @@ defmodule KuberaWeb.CoinControllerTest do
       conn = get conn, coin_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
-        "name" => "some name"}
+        "image" => "some image",
+        "name" => "some name",
+        "symbol" => "some symbol"}
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -51,7 +53,9 @@ defmodule KuberaWeb.CoinControllerTest do
       conn = get conn, coin_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
         "id" => id,
-        "name" => "some updated name"}
+        "image" => "some updated image",
+        "name" => "some updated name",
+        "symbol" => "some updated symbol"}
     end
 
     test "renders errors when data is invalid", %{conn: conn, coin: coin} do

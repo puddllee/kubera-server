@@ -20,7 +20,7 @@ defmodule Kubera.Mixfile do
   def application do
     [
       mod: {Kubera.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :httpoison]
     ]
   end
 
@@ -44,6 +44,10 @@ defmodule Kubera.Mixfile do
       {:ueberauth, "~> 0.4"},
       {:ueberauth_google, "~> 0.5"},
       {:comeonin, "~> 3.2"},
+      {:quantum, ">= 2.2.1"},
+      {:timex, "~> 3.0"},
+      {:poison, "~> 3.1"},
+      {:httpoison, "~> 0.13"}
     ]
   end
 

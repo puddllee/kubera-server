@@ -5,6 +5,7 @@ defmodule Kubera.Crypto.Coin do
 
 
   schema "coins" do
+    field :image, :string
     field :name, :string
     field :symbol, :string
 
@@ -14,7 +15,7 @@ defmodule Kubera.Crypto.Coin do
   @doc false
   def changeset(%Coin{} = coin, attrs) do
     coin
-    |> cast(attrs, [:name, :symbol])
-    |> validate_required([:name, :symbol])
+    |> cast(attrs, [:name, :symbol, :image])
+    |> validate_required([:name, :symbol, :image])
   end
 end

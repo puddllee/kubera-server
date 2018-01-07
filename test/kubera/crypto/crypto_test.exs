@@ -62,4 +62,68 @@ defmodule Kubera.CryptoTest do
       assert %Ecto.Changeset{} = Crypto.change_coin(coin)
     end
   end
+
+  describe "coins" do
+    alias Kubera.Crypto.Coin
+
+    @valid_attrs %{image: "some image", name: "some name", symbol: "some symbol"}
+    @update_attrs %{image: "some updated image", name: "some updated name", symbol: "some updated symbol"}
+    @invalid_attrs %{image: nil, name: nil, symbol: nil}
+
+    def coin_fixture(attrs \\ %{}) do
+      {:ok, coin} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Crypto.create_coin()
+
+      coin
+    end
+
+    test "list_coins/0 returns all coins" do
+      coin = coin_fixture()
+      assert Crypto.list_coins() == [coin]
+    end
+
+    test "get_coin!/1 returns the coin with given id" do
+      coin = coin_fixture()
+      assert Crypto.get_coin!(coin.id) == coin
+    end
+
+    test "create_coin/1 with valid data creates a coin" do
+      assert {:ok, %Coin{} = coin} = Crypto.create_coin(@valid_attrs)
+      assert coin.image == "some image"
+      assert coin.name == "some name"
+      assert coin.symbol == "some symbol"
+    end
+
+    test "create_coin/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Crypto.create_coin(@invalid_attrs)
+    end
+
+    test "update_coin/2 with valid data updates the coin" do
+      coin = coin_fixture()
+      assert {:ok, coin} = Crypto.update_coin(coin, @update_attrs)
+      assert %Coin{} = coin
+      assert coin.image == "some updated image"
+      assert coin.name == "some updated name"
+      assert coin.symbol == "some updated symbol"
+    end
+
+    test "update_coin/2 with invalid data returns error changeset" do
+      coin = coin_fixture()
+      assert {:error, %Ecto.Changeset{}} = Crypto.update_coin(coin, @invalid_attrs)
+      assert coin == Crypto.get_coin!(coin.id)
+    end
+
+    test "delete_coin/1 deletes the coin" do
+      coin = coin_fixture()
+      assert {:ok, %Coin{}} = Crypto.delete_coin(coin)
+      assert_raise Ecto.NoResultsError, fn -> Crypto.get_coin!(coin.id) end
+    end
+
+    test "change_coin/1 returns a coin changeset" do
+      coin = coin_fixture()
+      assert %Ecto.Changeset{} = Crypto.change_coin(coin)
+    end
+  end
 end

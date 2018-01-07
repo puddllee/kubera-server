@@ -17,6 +17,11 @@ config :kubera, KuberaWeb.Endpoint,
   pubsub: [name: Kubera.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :kubera, Kubera.Crypto.Scheduler,
+  jobs: [
+    {"*/15 * * * *", {Kubera.Crypto.Api, :save_coinlist, []}}
+  ]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
