@@ -137,7 +137,7 @@ defmodule Kubera.Accounts do
   def get_group(%User{} = user, uid) do
     group = Ecto.assoc(user, :groups)
     |> where(uid: ^uid)
-    |> preload([:users])
+    |> preload(:users)
     |> Repo.one()
 
     case group do

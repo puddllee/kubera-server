@@ -11,10 +11,15 @@ defmodule KuberaWeb.GroupView do
   end
 
   def render("group.json", %{group: group}) do
+    users = case group.users do
+              %Ecto.Association.NotLoaded{} -> []
+              users -> render_many(users, KuberaWeb.UserView, "user.json")
+            end
     %{id: group.id,
       name: group.name,
       uid: group.uid,
       buyin: group.buyin,
-      joinable: group.joinable}
+      joinable: group.joinable,
+      users: users}
   end
 end
