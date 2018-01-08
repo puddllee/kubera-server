@@ -8,13 +8,19 @@ defmodule KuberaWeb.Router do
   end
 
   scope "/api/v1", KuberaWeb do
+    pipe_through [:api]
+
+    get "/coins", CoinController, :index
+    get "/coins/:symbol/hist", CoinController, :price
+  end
+
+  scope "/api/v1", KuberaWeb do
     pipe_through [:api, Plugs.AuthAccessPipeline]
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/groups", GroupController, except: [:new, :edit]
+    post "/groups/:uid/join", GroupController, :join
     get "/profile", UserController, :show
-    get "/coins", CoinController, :index
-    get "/coins/:symbol/hist", CoinController, :price
   end
 
   scope "/api/v1/auth", KuberaWeb do

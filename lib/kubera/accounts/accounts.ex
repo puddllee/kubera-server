@@ -115,8 +115,9 @@ defmodule Kubera.Accounts do
       [%Group{}, ...]
 
   """
-  def list_groups do
-    Repo.all(Group)
+  def list_groups(user) do
+    Ecto.assoc(user, :groups)
+    |> Repo.all()
   end
 
   @doc """
@@ -133,7 +134,12 @@ defmodule Kubera.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_group!(id), do: Repo.get!(Group, id)
+  def get_group(%User{} = user, uid) do
+    Ecto.assoc(user, :groups)
+    |> where(uid: ^uid)
+    |> preload([:users])
+    |> Repo.one()
+  end
 
   @doc """
   Creates a group.

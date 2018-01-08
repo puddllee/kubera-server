@@ -3,11 +3,12 @@ defmodule KuberaWeb.GroupController do
 
   alias Kubera.Accounts
   alias Kubera.Accounts.Group
+  alias KuberaWeb.ErrorView
 
   action_fallback KuberaWeb.FallbackController
 
   def index(conn, _params) do
-    groups = Accounts.list_groups()
+    groups = Accounts.list_groups(conn.assigns.user)
     render(conn, "index.json", groups: groups)
   end
 
@@ -25,9 +26,16 @@ defmodule KuberaWeb.GroupController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    group = Accounts.get_group!(id)
-    render(conn, "show.json", group: group)
+  def show(conn, %{"id" => uid}) do
+    case Accounts.get_group(conn.assigns.user, uid) do
+      %Group{} = group ->
+        conn
+        |> render("show.json", group: group)
+      nil ->
+        conn
+        |> put_status(404)
+        |> render(ErrorView, "404.json")
+    end
   end
 
   def update(conn, %{"id" => id, "group" => group_params}) do
