@@ -135,10 +135,17 @@ defmodule Kubera.Accounts do
 
   """
   def get_group(%User{} = user, uid) do
-    Ecto.assoc(user, :groups)
+    group = Ecto.assoc(user, :groups)
     |> where(uid: ^uid)
     |> preload([:users])
     |> Repo.one()
+
+    case group do
+      %Group{} = group ->
+        {:ok, group}
+      _ ->
+        {:error, nil}
+    end
   end
 
   @doc """
