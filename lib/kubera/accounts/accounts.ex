@@ -148,6 +148,14 @@ defmodule Kubera.Accounts do
     end
   end
 
+
+  def get_joinable_group(uid) do
+    case Repo.get_by(Group, uid: uid, joinable: true) do
+      %Group{} = group -> {:ok, group}
+      nil -> {:error, nil}
+    end
+  end
+
   @doc """
   Creates a group.
 
@@ -160,7 +168,7 @@ defmodule Kubera.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_group(user, attrs \\ %{}) do
+  def create_group(%User{} = user, attrs \\ %{}) do
     uid = Hashids.new([min_len: 3])
     |> Hashids.encode(:rand.uniform(10000000))
 
@@ -169,21 +177,27 @@ defmodule Kubera.Accounts do
     |> Repo.insert()
 
      case pgroup do
-       {:ok, group} ->
-         group = group |> Repo.preload(:users)
-
-         user = Repo.preload(user, :groups)
-         groups = user.groups ++ [group]
-         |> Enum.map(&Ecto.Changeset.change/1)
-
-         user
-         |> Ecto.Changeset.change
-         |> Ecto.Changeset.put_assoc(:groups, groups)
-         |> Repo.update!()
-
-         {:ok, group}
-         {:error, changeset} -> {:error, changeset}
+       {:ok, group} -> add_user_to_group(user, group)
+       {:error, changeset} -> {:error, changeset}
      end
+  end
+
+  def add_user_to_group(%User{} = user, %Group{} = group) do
+    user = Repo.preload(user, :groups)
+    group = Repo.preload(group, :users)
+
+    groups = user.groups ++ [group]
+    |> Enum.map(&Ecto.Changeset.change/1)
+
+    puser = user
+    |> Ecto.Changeset.change
+    |> Ecto.Changeset.put_assoc(:groups, groups)
+    |> Repo.update()
+
+    case puser do
+      {:ok, %User{}} -> {:ok, group |> Repo.preload(:users)}
+      _ -> {:error, nil}
+    end
   end
 
   @doc """

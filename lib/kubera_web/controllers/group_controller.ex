@@ -26,6 +26,15 @@ defmodule KuberaWeb.GroupController do
     end
   end
 
+  def join(conn, %{"uid" => uid}) do
+    with  {:ok, %Group{} = group} <- Accounts.get_joinable_group(uid),
+          {:ok, %Group{} = group} <- Accounts.add_user_to_group(conn.assigns.user, group) do
+      conn |> render("show.json", group: group)
+    else
+      _ -> send_error(conn, 404)
+    end
+  end
+
   def show(conn, %{"id" => uid}) do
     case Accounts.get_group(conn.assigns.user, uid) do
       {:ok, %Group{} = group} ->
