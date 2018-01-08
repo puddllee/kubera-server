@@ -9,6 +9,15 @@ defmodule Kubera.Crypto.Coin do
     field :name, :string
     field :symbol, :string
     field :rank, :integer
+    field :price_btc, :float
+    field :price_usd, :float
+    field :marketcap, :float
+    field :percent_change_1h, :float
+    field :percent_change_24h, :float
+    field :percent_change_7d, :float
+    field :available_supply, :float
+    field :max_supply, :float
+    field :last_updated, :integer
 
     timestamps()
   end
@@ -16,8 +25,8 @@ defmodule Kubera.Crypto.Coin do
   @doc false
   def changeset(%Coin{} = coin, attrs) do
     coin
-    |> cast(attrs, [:name, :symbol, :image, :rank])
-    |> validate_required([:name, :symbol, :image, :rank])
+    |> cast(attrs, [:name, :symbol, :rank, :price_usd, :marketcap])
+    |> validate_required([:name, :symbol, :rank, :price_usd, :marketcap])
     |> unique_constraint(:symbol)
   end
 end
