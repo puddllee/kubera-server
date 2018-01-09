@@ -1,7 +1,5 @@
 defmodule Kubera.Crypto.Api do
 
-  alias Kubera.Crypto
-
   @cryptocompare_base "https://min-api.cryptocompare.com/data/"
   @coinlist "all/coinlist"
   @histominute "histominute"
@@ -11,24 +9,27 @@ defmodule Kubera.Crypto.Api do
   @coinmarketcap "https://api.coinmarketcap.com/v1/ticker/"
 
   def fetch_coins do
-    IO.puts "write me!"
+    case fetch_coinmarketcap do
+      {:ok, coins} ->
+        ccompare = fetch_cryptocompare()
+        coins = coins
+        |> Enum.map(fn c ->
+          ccompare_coin = Map.get(ccompare, Map.get(c, :symbol), %{})
+          image = Map.get(ccompare_coin, "ImageUrl", "")
+          Map.put(c, :image, "https://www.cryptocompare.com#{image}")
+        end)
+        coins
+      {:error, _} -> []
+    end
   end
-  def fetch_coinlist do
+
+  def fetch_cryptocompare do
     case HTTPoison.get(@cryptocompare_base <> @coinlist) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         decoded = Poison.decode!(body)
-        data = Map.get(decoded, "Data")
-        data
-        |> Map.values
-        |> Enum.map(fn c ->
-          %{ image: "#{"https://www.cryptocompare.com"}#{Map.get(c, "ImageUrl")}",
-             name: Map.get(c, "CoinName"),
-             symbol: Map.get(c, "Symbol"),
-             rank: Map.get(c, "SortOrder")}
-        end)
+        Map.get(decoded, "Data")
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason
-        []
     end
   end
 
@@ -76,5 +77,4 @@ defmodule Kubera.Crypto.Api do
         reason
     end
   end
-  
 end

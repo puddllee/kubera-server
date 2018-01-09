@@ -25,7 +25,7 @@ defmodule Kubera.Crypto.Coin do
   @doc false
   def changeset(%Coin{} = coin, attrs) do
     coin
-    |> cast(attrs, [:name, :symbol, :rank, :price_usd, :marketcap])
+    |> cast(attrs, [:name, :symbol, :rank, :image, :price_btc, :price_usd, :marketcap, :percent_change_1h, :percent_change_24h, :percent_change_7d, :available_supply, :max_supply, :last_updated])
     |> validate_required([:name, :symbol, :rank, :price_usd, :marketcap])
     |> unique_constraint(:symbol)
   end

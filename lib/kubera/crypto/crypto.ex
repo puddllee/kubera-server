@@ -77,9 +77,12 @@ defmodule Kubera.Crypto do
   end
 
   def upsert_coin(attrs \\ %{}) do
-    case Repo.get_by(Coin, symbol: attrs.symbol) do
-      {:ok, coin} -> update_coin(coin, attrs)
-      _ -> create_coin(attrs)
+    # IO.puts "Upserting with symbol #{attrs.symbol}"
+    case Repo.get_by(Coin, symbol: Map.get(attrs, :symbol)) do
+      %Coin{} = coin ->
+        update_coin(coin, attrs)
+      nil ->
+        create_coin(attrs)
     end
   end
 
@@ -113,7 +116,7 @@ defmodule Kubera.Crypto do
   end
 
   def save_coinlist do
-    Api.fetch_coinlist
+    Api.fetch_coins
     |> Enum.map(&upsert_coin/1)
   end
 
