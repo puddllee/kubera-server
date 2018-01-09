@@ -15,10 +15,10 @@ defmodule KuberaWeb.CoinView do
   end
 
   def render("coin.json", %{coin: coin}) do
-    %{id: coin.id,
-      name: coin.name,
-      symbol: coin.symbol,
-      image: coin.image}
+    # Map.from_struct coin
+    coin
+    |> Map.from_struct
+    |> Map.drop([:__meta__, :updated_at, :inserted_at])
   end
 
 end

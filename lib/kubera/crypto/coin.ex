@@ -3,7 +3,6 @@ defmodule Kubera.Crypto.Coin do
   import Ecto.Changeset
   alias Kubera.Crypto.Coin
 
-
   schema "coins" do
     field :image, :string
     field :name, :string

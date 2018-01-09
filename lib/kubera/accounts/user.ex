@@ -3,7 +3,6 @@ defmodule Kubera.Accounts.User do
   import Ecto.Changeset
   alias Kubera.Accounts.User
 
-
   schema "users" do
     field :auth_provider, :string
     field :avatar, :string
