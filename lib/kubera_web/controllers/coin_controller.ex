@@ -17,14 +17,13 @@ defmodule KuberaWeb.CoinController do
     render(conn, "show.json", coin: coin)
   end
 
-  def price(conn, %{"symbol" => symbol} = params) do
-    freq = Map.get(params, "freq", "histominute")
-    data = Crypto.fetch_coin(freq, symbol, [
-          "toTs": Map.get(params, "from", DateTime.to_unix(Timex.now)),
-          "aggregate": Map.get(params, "aggregate", "2"),
-          "tsym": Map.get(params, "tsym", "USD")
-        ])
-    render(conn, "price.json", symbol: symbol, data: data)
+  def price(conn, %{"freq" => freq, "symbol" => symbol} = params) do
+    case Crypto.fetch_history(freq, symbol) do
+      {:ok, data} ->
+        render(conn, "price.json", symbol: symbol, data: data)
+      {:error, reason} ->
+        send_error(conn, 503, reason)
+    end
   end
   def price(conn, _) do
    send_error(conn, 400)

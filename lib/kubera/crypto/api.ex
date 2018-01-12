@@ -8,6 +8,8 @@ defmodule Kubera.Crypto.Api do
 
   @coinmarketcap "https://api.coinmarketcap.com/v1/ticker/"
 
+  @coincap "https://coincap.io/"
+
   def fetch_coins do
     case fetch_coinmarketcap do
       {:ok, coins} ->
@@ -55,6 +57,29 @@ defmodule Kubera.Crypto.Api do
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason
         {:error, reason}
+    end
+  end
+
+  def fetch_history(freq, symbol, opts \\ []) do
+    case HTTPoison.get(@coincap <> "history/" <> freq <> "/" <> symbol) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        decoded = Poison.decode!(body)
+
+        price = Map.get(decoded, "price")
+        market_cap = Map.get(decoded, "market_cap")
+        volume = Map.get(decoded, "volume")
+
+        [price, market_cap, volume]
+        |> Enum.zip
+        |> Enum.map (fn d ->
+          {[ts, price], [_, mc], [_, v]} = d
+          %{"ts" => ts,
+            "price" => price,
+            "market_cap" => mc,
+            "volume" => div(v, 1000)}
+        end)
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        reason
     end
   end
 

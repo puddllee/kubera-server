@@ -11,7 +11,7 @@ defmodule KuberaWeb.Router do
     pipe_through [:api]
 
     get "/coins", CoinController, :index
-    get "/coins/:symbol/hist", CoinController, :price
+    get "/coins/history/:freq/:symbol", CoinController, :price
   end
 
   scope "/api/v1", KuberaWeb do

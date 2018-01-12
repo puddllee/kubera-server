@@ -120,7 +120,11 @@ defmodule Kubera.Crypto do
     |> Enum.map(&upsert_coin/1)
   end
 
-  def fetch_coin(freq, symbol, opts \\ []) do
-    Api.fetch_coin(freq, symbol, opts)
+  def fetch_history(freq, symbol, opts \\ []) do
+    case Api.fetch_history(freq, symbol) do
+      [_ | _] = data -> {:ok, data}
+      :timeout -> {:error, "timeout"}
+      _ -> {:error, "unknown_error"}
+    end
   end
 end

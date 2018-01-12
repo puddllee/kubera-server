@@ -24,8 +24,9 @@ defmodule KuberaWeb.ErrorView do
     build_response("Unprocessable entity", 422)
   end
 
-  def render("500.json", _assigns) do
-    build_response("Internal Server Error", 500)
+  def render("500.json", assigns) do
+    message = Map.get(assigns, :message, "")
+    build_response("Internal Server Error", 500, message)
   end
 
   # In case no render clause matches or no
@@ -34,10 +35,13 @@ defmodule KuberaWeb.ErrorView do
     render "500.json", assigns
   end
 
-  def send_error(conn, status) do
-    conn |> put_status(status) |> Phoenix.Controller.render(ErrorView, to_string(status) <> ".json")
+  def send_error(conn, status, message \\ "") do
+    conn
+    |> put_status(status)
+    |> Phoenix.Controller.render(ErrorView, to_string(status) <> ".json", message: message)
   end
 
-  defp build_response(message, code), do: %{title: message, code: code}
-
+  defp build_response(message, code, reason \\ "") do
+    %{title: message, code: code, reason: reason}
+  end
 end
