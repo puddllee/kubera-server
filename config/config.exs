@@ -12,6 +12,7 @@ config :kubera,
 # Configures the endpoint
 config :kubera, KuberaWeb.Endpoint,
   url: [host: "localhost"],
+  http: [compress: true],
   secret_key_base: "fbwTnJwfyPKDOlZ3roJxD+4wY4DNSORwHvhX/LfQP5CG8dylS5cU6FJnk6MXVj5M",
   render_errors: [view: KuberaWeb.ErrorView, accepts: ~w(json html)],
   pubsub: [name: Kubera.PubSub,
