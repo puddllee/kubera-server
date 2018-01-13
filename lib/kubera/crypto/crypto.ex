@@ -122,9 +122,10 @@ defmodule Kubera.Crypto do
 
   def fetch_history(freq, symbol, opts \\ []) do
     case Api.fetch_history(freq, symbol) do
-      [_ | _] = data -> {:ok, data}
-      :timeout -> {:error, "timeout"}
-      _ -> {:error, "unknown_error"}
+      {:ok, data} -> {:ok, data}
+      {:error, :timeout} -> {:error, "timeout"}
+      _ ->
+        {:error, "unknown_error"}
     end
   end
 end

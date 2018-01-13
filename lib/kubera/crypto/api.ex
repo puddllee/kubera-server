@@ -69,37 +69,19 @@ defmodule Kubera.Crypto.Api do
         market_cap = Map.get(decoded, "market_cap")
         volume = Map.get(decoded, "volume")
 
-        [price, market_cap, volume]
+        history = [price, market_cap, volume]
         |> Enum.zip
-        |> Enum.map (fn d ->
+        |> Enum.map(fn d ->
           {[ts, price], [_, mc], [_, v]} = d
           %{"ts" => ts,
             "price" => price,
             "market_cap" => mc,
             "volume" => div(v, 1000)}
         end)
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        reason
-    end
-  end
 
-  def fetch_coin(freq, symbol, opts \\ []) do
-    opts = Keyword.merge([
-      "tsym": "USD",
-      "limit": 2000,
-      "e": "CCCAGG",
-      "aggregate": "2",
-      "fsym": symbol
-    ], opts)
-    params = Keyword.keys(opts)
-    |> Enum.map(fn k -> {k, Keyword.get(opts, k)} end)
-
-    case HTTPoison.get(@cryptocompare_base <> freq, [], params: params) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        decoded = Poison.decode!(body)
-        Map.get(decoded, "Data")
+        {:ok, history}
       {:error, %HTTPoison.Error{reason: reason}} ->
-        reason
+        {:error, reason}
     end
   end
 end

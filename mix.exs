@@ -37,7 +37,7 @@ defmodule Kubera.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.13.0"},
       {:cowboy, "~> 1.0"},
       {:ja_serializer, "~> 0.12.0"},
       {:guardian, "~> 1.0"},
