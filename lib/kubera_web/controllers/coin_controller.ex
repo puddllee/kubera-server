@@ -12,9 +12,13 @@ defmodule KuberaWeb.CoinController do
     render(conn, "index.json", coins: coins)
   end
 
-  def show(conn, %{"id" => id}) do
-    coin = Crypto.get_coin!(id)
-    render(conn, "show.json", coin: coin)
+  def show(conn, %{"symbol" => symbol}) do
+    case Crypto.get_coin_by_symbol(symbol) do
+      {:ok, %Coin{} = coin} ->
+        render(conn, "show.json", coin: coin)
+      {:error, _} ->
+        send_error(conn, 404)
+    end
   end
 
   def price(conn, %{"freq" => freq, "symbol" => symbol} = params) do

@@ -2,16 +2,21 @@ defmodule KuberaWeb.CoinControllerTest do
   use KuberaWeb.ConnCase
 
   alias Kubera.Crypto
-  alias Kubera.Crypto.Coin
 
-  @create_attrs %{image: "some image", name: "some name", symbol: "some symbol"}
-  @update_attrs %{image: "some updated image", name: "some updated name", symbol: "some updated symbol"}
-  @invalid_attrs %{image: nil, name: nil, symbol: nil}
-
-  def fixture(:coin) do
-    {:ok, coin} = Crypto.create_coin(@create_attrs)
-    coin
-  end
+  @valid_attrs %{
+    image: "some image",
+    name: "Etherum",
+    symbol: "ETH",
+    rank: 1,
+    price_btc: 0.5,
+    price_usd: 1000,
+    marketcap: 1000000,
+    percent_change_1h: 1.2,
+    percent_change_24h: -23.4,
+    percent_change_7d: 100.001,
+    available_supply: 1000,
+    max_supply: 100,
+    last_updated: 1000000}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -20,64 +25,31 @@ defmodule KuberaWeb.CoinControllerTest do
   describe "index" do
     test "lists all coins", %{conn: conn} do
       conn = get conn, coin_path(conn, :index)
-      assert json_response(conn, 200)["data"] == []
+      assert json_response(conn, 200) == []
     end
   end
 
-  describe "create coin" do
-    test "renders coin when data is valid", %{conn: conn} do
-      conn = post conn, coin_path(conn, :create), coin: @create_attrs
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = get conn, coin_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "image" => "some image",
-        "name" => "some name",
-        "symbol" => "some symbol"}
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, coin_path(conn, :create), coin: @invalid_attrs
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update coin" do
+  describe "show" do
     setup [:create_coin]
 
-    test "renders coin when data is valid", %{conn: conn, coin: %Coin{id: id} = coin} do
-      conn = put conn, coin_path(conn, :update, coin), coin: @update_attrs
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get conn, coin_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "image" => "some updated image",
-        "name" => "some updated name",
-        "symbol" => "some updated symbol"}
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, coin: coin} do
-      conn = put conn, coin_path(conn, :update, coin), coin: @invalid_attrs
-      assert json_response(conn, 422)["errors"] != %{}
+    test "get a specific coin", %{conn: conn} do
+      conn = get conn, coin_path(conn, :show, "ETH")
+      res = json_response(conn, 200)
+      assert Map.get(res, "symbol") == "ETH"
     end
   end
 
-  describe "delete coin" do
+  describe "history" do
     setup [:create_coin]
 
-    test "deletes chosen coin", %{conn: conn, coin: coin} do
-      conn = delete conn, coin_path(conn, :delete, coin)
-      assert response(conn, 204)
-      assert_error_sent 404, fn ->
-        get conn, coin_path(conn, :show, coin)
-      end
+    test "get a coins history", %{conn: conn} do
+      conn = get conn, coin_path(conn, :price, "1day", "ETH")
+      res = json_response(conn, 200)
+      assert Map.get(res, "symbol") == "ETH"
     end
   end
 
   defp create_coin(_) do
-    coin = fixture(:coin)
-    {:ok, coin: coin}
+    {:ok, coin: Crypto.create_coin(@valid_attrs)}
   end
 end

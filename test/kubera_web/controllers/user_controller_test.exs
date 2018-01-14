@@ -2,7 +2,7 @@ defmodule KuberaWeb.UserControllerTest do
   use KuberaWeb.ConnCase
 
   setup %{conn: conn} do
-    {:ok, conn: conn}
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   describe "show profile" do

@@ -12,13 +12,15 @@ defmodule KuberaWeb.Router do
 
     get "/coins", CoinController, :index
     get "/coins/history/:freq/:symbol", CoinController, :price
+    get "/coins/:symbol", CoinController, :show
   end
 
   scope "/api/v1", KuberaWeb do
     pipe_through [:api, Plugs.AuthAccessPipeline]
 
-    resources "/users", UserController, except: [:new, :edit, :show]
     get "/profile", UserController, :show
+    resources "/users", UserController, except: [:new, :edit, :show]
+
     resources "/groups", GroupController, except: [:new, :edit]
     post "/groups/:uid/join", GroupController, :join
   end

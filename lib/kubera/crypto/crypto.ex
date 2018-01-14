@@ -40,6 +40,13 @@ defmodule Kubera.Crypto do
   """
   def get_coin!(id), do: Repo.get!(Coin, id)
 
+  def get_coin_by_symbol(symbol) do
+    case Repo.get_by(Coin, symbol: symbol) do
+      %Coin{} = coin -> {:ok, coin}
+      _ -> {:error, nil}
+    end
+  end
+
   @doc """
   Creates a coin.
 
@@ -77,7 +84,6 @@ defmodule Kubera.Crypto do
   end
 
   def upsert_coin(attrs \\ %{}) do
-    # IO.puts "Upserting with symbol #{attrs.symbol}"
     case Repo.get_by(Coin, symbol: Map.get(attrs, :symbol)) do
       %Coin{} = coin ->
         update_coin(coin, attrs)
