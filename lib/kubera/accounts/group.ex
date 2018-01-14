@@ -16,11 +16,9 @@ defmodule Kubera.Accounts.Group do
 
   @doc false
   def changeset(%Group{} = group, attrs) do
-    IO.puts "\n---"
-    IO.inspect group
     group
     |> cast(attrs, [:name, :buyin, :joinable, :uid])
-    |> IO.inspect
     |> validate_required([:name, :buyin, :joinable, :uid])
   end
 end
+

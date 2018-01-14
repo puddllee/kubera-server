@@ -4,37 +4,40 @@ defmodule KuberaWeb.GroupControllerTest do
   alias Kubera.Accounts
   alias Kubera.Accounts.Group
 
-  @create_attrs %{buyin: 42, joinable: true, name: "some name"}
-  @update_attrs %{buyin: 43, joinable: false, name: "some updated name"}
+  @create_attrs %{"buyin" => 42, "joinable" => true, "name" => "some name"}
+  @update_attrs %{"buyin" => 43, "name" => "some updated name"}
   @invalid_attrs %{buyin: nil, joinable: nil, name: nil}
 
-  def fixture(:group) do
-    {:ok, group} = Accounts.create_group(@create_attrs)
-    group
-  end
-
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn = conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("shit", "shit")
+    {:ok, conn: conn}
   end
 
   describe "index" do
-    test "lists all groups", %{conn: conn} do
+    setup [:login, :create_group]
+
+    test "lists all groups", %{conn: conn, group: %{id: id, uid: uid}} do
       conn = get conn, group_path(conn, :index)
-      assert json_response(conn, 200)["data"] == []
+      assert json_response(conn, 200) == [Map.merge(@create_attrs, %{
+                                                 "id" => id,
+                                                 "uid" => uid,
+                                                 "users" => []
+                                                    })]
     end
   end
 
   describe "create group" do
+    setup [:login]
+
     test "renders group when data is valid", %{conn: conn} do
       conn = post conn, group_path(conn, :create), group: @create_attrs
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"uid" => uid} = json_response(conn, 201)
 
-      conn = get conn, group_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "buyin" => 42,
-        "joinable" => true,
-        "name" => "some name"}
+      user = conn.assigns.user
+      {:ok, group} = Accounts.get_group(user, uid)
+      assert Map.get(group, :uid) == uid
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -44,40 +47,41 @@ defmodule KuberaWeb.GroupControllerTest do
   end
 
   describe "update group" do
-    setup [:create_group]
+    setup [:login, :create_group]
 
-    test "renders group when data is valid", %{conn: conn, group: %Group{id: id} = group} do
-      conn = put conn, group_path(conn, :update, group), group: @update_attrs
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+    test "renders group when data is valid", %{conn: conn, group: %Group{uid: uid}} do
+      conn = put conn, group_path(conn, :update, uid), group: @update_attrs
+      assert %{"uid" => ^uid} = json_response(conn, 200)
 
-      conn = get conn, group_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "buyin" => 43,
-        "joinable" => false,
-        "name" => "some updated name"}
+      user = conn.assigns.user
+      {:ok, group} = Accounts.get_group(user, uid)
+      assert Map.get(group, :name) == "some updated name"
     end
 
-    test "renders errors when data is invalid", %{conn: conn, group: group} do
-      conn = put conn, group_path(conn, :update, group), group: @invalid_attrs
-      assert json_response(conn, 422)["errors"] != %{}
+    test "renders errors when data is invalid", %{conn: conn, group: %Group{uid: uid}} do
+      conn = put conn, group_path(conn, :update, uid), group: @invalid_attrs
+      assert json_response(conn, 404)["errors"] != %{}
     end
   end
 
   describe "delete group" do
-    setup [:create_group]
+    setup [:login, :create_group]
 
-    test "deletes chosen group", %{conn: conn, group: group} do
-      conn = delete conn, group_path(conn, :delete, group)
+    test "deletes chosen group", %{conn: conn, group: %Group{uid: uid}} do
+      conn = delete conn, group_path(conn, :delete, uid)
       assert response(conn, 204)
-      assert_error_sent 404, fn ->
-        get conn, group_path(conn, :show, group)
-      end
+      user = conn.assigns.user
+
+      {:error, nil} = Accounts.get_group(user, uid)
     end
   end
 
-  defp create_group(_) do
-    group = fixture(:group)
+  defp create_group(%{conn: conn}) do
+    {:ok, group} = Accounts.create_group(conn.assigns.user, @create_attrs)
     {:ok, group: group}
+  end
+
+  defp login(%{conn: conn}) do
+    {:ok, conn: conn |> login_user()}
   end
 end

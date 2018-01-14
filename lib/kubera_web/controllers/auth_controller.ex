@@ -30,7 +30,6 @@ defmodule KuberaWeb.AuthController do
   def sign_in_user(conn, %{"user" => user}) do
     # Attemp to retrieve exactly one user from the DB,
     # whose email matches the one provided with the login request
-    IO.inspect user
     case Repo.get_by(User, email: user.email) do
       %User{} = user ->
         {:ok, jwt, _} = Kubera.Guardian.encode_and_sign(user)
