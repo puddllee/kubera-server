@@ -4,8 +4,8 @@ defmodule KuberaWeb.GroupControllerTest do
   alias Kubera.Accounts
   alias Kubera.Accounts.Group
 
-  @create_attrs %{"buyin" => 42, "joinable" => true, "name" => "some name"}
-  @update_attrs %{"buyin" => 43, "name" => "some updated name"}
+  @create_attrs %{:buyin => 42, :joinable => true, :name => "some name"}
+  @update_attrs %{:buyin => 43, :name => "some updated name"}
   @invalid_attrs %{buyin: nil, joinable: nil, name: nil}
 
   setup %{conn: conn} do
@@ -20,11 +20,18 @@ defmodule KuberaWeb.GroupControllerTest do
 
     test "lists all groups", %{conn: conn, group: %{id: id, uid: uid}} do
       conn = get conn, group_path(conn, :index)
-      assert json_response(conn, 200) == [Map.merge(@create_attrs, %{
-                                                 "id" => id,
-                                                 "uid" => uid,
-                                                 "users" => []
-                                                    })]
+
+      [res | _] = json_response(conn, 200)
+      k = Map.keys(res)
+      |> Enum.map(&(String.to_atom(&1)))
+      v = Map.values(res)
+      result = Enum.zip(k, v) |> Enum.into(%{})
+
+      assert result == Map.merge(@create_attrs, %{
+                                                 :id => id,
+                                                 :uid => uid,
+                                                 :users => []
+                                                    })
     end
   end
 

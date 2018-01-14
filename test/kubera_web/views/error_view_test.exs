@@ -6,16 +6,16 @@ defmodule KuberaWeb.ErrorViewTest do
 
   test "renders 404.json" do
     assert render(KuberaWeb.ErrorView, "404.json", []) ==
-           %{errors: %{detail: "Page not found"}}
+           %{code: 404, title: "Resource not found", reason: ""}
   end
 
   test "render 500.json" do
     assert render(KuberaWeb.ErrorView, "500.json", []) ==
-           %{errors: %{detail: "Internal server error"}}
+           %{code: 500, title: "Internal Server Error", reason: ""}
   end
 
   test "render any other" do
     assert render(KuberaWeb.ErrorView, "505.json", []) ==
-           %{errors: %{detail: "Internal server error"}}
+           %{code: 500, title: "Internal Server Error", reason: ""}
   end
 end

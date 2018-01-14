@@ -172,8 +172,13 @@ defmodule Kubera.Accounts do
     uid = Hashids.new([min_len: 3])
     |> Hashids.encode(:rand.uniform(10000000))
 
+    key = case Map.get(attrs, :name) do
+            nil -> "uid"
+            _   -> :uid
+          end
+
     pgroup = %Group{}
-    |> Group.changeset(Map.put(attrs, "uid", uid))
+    |> Group.changeset(Map.put(attrs, key, uid))
     |> Repo.insert()
 
      case pgroup do
