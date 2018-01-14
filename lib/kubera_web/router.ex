@@ -17,10 +17,10 @@ defmodule KuberaWeb.Router do
   scope "/api/v1", KuberaWeb do
     pipe_through [:api, Plugs.AuthAccessPipeline]
 
-    resources "/users", UserController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit, :show]
+    get "/profile", UserController, :show
     resources "/groups", GroupController, except: [:new, :edit]
     post "/groups/:uid/join", GroupController, :join
-    get "/profile", UserController, :show
   end
 
   scope "/api/v1/auth", KuberaWeb do
