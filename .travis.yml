@@ -1,0 +1,14 @@
+language: elixir
+elixir:
+- 1.5.3
+otp_release:
+- 20.0.5
+before_install:
+- openssl aes-256-cbc -K $encrypted_2472d90a6dab_key -iv $encrypted_2472d90a6dab_iv
+  -in .travis/travis_dokku.enc -out .travis/travis_dokku -d
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: .travis/deploy.sh
+  on:
+    branch: master

@@ -222,3 +222,7 @@ erl_crash.dump
 /config/*.secret.exs
 
 .env
+
+# Credentials
+.travis/*travis_dokku
+.travis/*travis_dokku.pub
