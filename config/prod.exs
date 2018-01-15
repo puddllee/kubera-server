@@ -31,6 +31,7 @@ config :logger, level: :info
 
 # ## SSL Support
 #
+#
 # To get SSL working, you will need to add the `https` key
 # to the previous section and set your `:url` port to 443:
 #
