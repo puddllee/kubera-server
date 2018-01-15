@@ -17,7 +17,6 @@ config :kubera, KuberaWeb.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [host: System.get_env("DOMAIN"), port: 80],
   load_from_system_env: true,
-  cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure the database
