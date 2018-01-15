@@ -48,7 +48,8 @@ defmodule Kubera.Mixfile do
       {:timex, "~> 3.0"},
       {:poison, "~> 3.1"},
       {:httpoison, "~> 0.13"},
-      {:hashids, "~> 2.0"}
+      {:hashids, "~> 2.0"},
+      {:cors_plug, "~> 1.2"}
     ]
   end
 

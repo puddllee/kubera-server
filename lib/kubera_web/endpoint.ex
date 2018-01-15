@@ -36,6 +36,7 @@ defmodule KuberaWeb.Endpoint do
     key: "_kubera_key",
     signing_salt: "PMAyPn0g"
 
+  plug CORSPlug, origin: ["http://localhost:3000", "https://kuberaexchange.com"]
   plug KuberaWeb.Router
 
   @doc """
