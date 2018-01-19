@@ -47,6 +47,11 @@ defmodule KuberaWeb.CoinControllerTest do
       res = json_response(conn, 200)
       assert Map.get(res, "symbol") == "ETH"
     end
+
+    test "404 for history of non-existing coin", %{conn: conn} do
+      conn = get conn, coin_path(conn, :price, "1day", "ASALKHAKLGAKSFLKAHSFLKHSF")
+      response(conn, 404)
+    end
   end
 
   defp create_coin(_) do

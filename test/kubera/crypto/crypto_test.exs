@@ -87,6 +87,7 @@ defmodule Kubera.CryptoTest do
     end
 
     test "fetch_history/3 gets coin history data" do
+      Crypto.save_coinlist()
       ["1day", "7day", "30day", "90day", "180day", "365day"]
       |> Enum.map(fn freq ->
         {:ok, history} = Crypto.fetch_history(freq, "ETH")
