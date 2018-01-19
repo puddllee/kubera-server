@@ -11,27 +11,36 @@ defmodule Kubera.Crypto.Api do
   @coincap "https://coincap.io/"
 
   def fetch_coins do
-    case fetch_coinmarketcap do
-      {:ok, coins} ->
-        ccompare = fetch_cryptocompare()
-        coins = coins
-        |> Enum.map(fn c ->
-          ccompare_coin = Map.get(ccompare, Map.get(c, :symbol), %{})
-          image = Map.get(ccompare_coin, "ImageUrl", "")
-          Map.put(c, :image, "https://www.cryptocompare.com#{image}")
-        end)
-        coins
-      {:error, _} -> []
-    end
+    with   {:ok, coins} <- fetch_coinmarketcap(),
+           {:ok, ccompare_coins} <- fetch_cryptocompare(),
+           coins <- add_images_to_coins(coins, ccompare_coins),
+           {:ok, symbollist} <- fetch_coincaplist()
+      do
+        {:ok, filter_coins_by_symbollist(coins, symbollist)}
+      else
+        err -> {:error, err}
+      end
+  end
+
+  def filter_coins_by_symbollist(coins, symbollist) do
+    Enum.filter(coins, fn c -> Map.get(c, :symbol) in symbollist end)
+  end
+
+  def add_images_to_coins(coins, ccompare_coins) do
+    Enum.map(coins, fn c ->
+      ccoin = Map.get(ccompare_coins, Map.get(c, :symbol), %{})
+      image = Map.get(ccoin, "ImageUrl", "")
+      Map.put(c, :image, "https://www.cryptocompare.com#{image}")
+    end)
   end
 
   def fetch_cryptocompare do
     case HTTPoison.get(@cryptocompare_base <> @coinlist) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         decoded = Poison.decode!(body)
-        Map.get(decoded, "Data")
+        {:ok, Map.get(decoded, "Data")}
       {:error, %HTTPoison.Error{reason: reason}} ->
-        IO.inspect reason
+        {:error, reason}
     end
   end
 
@@ -55,7 +64,15 @@ defmodule Kubera.Crypto.Api do
         end)
         {:ok, coins}
       {:error, %HTTPoison.Error{reason: reason}} ->
-        IO.inspect reason
+        {:error, reason}
+    end
+  end
+
+  def fetch_coincaplist do
+    case HTTPoison.get(@coincap <> "coins/") do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        Poison.decode(body)
+      {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end
   end

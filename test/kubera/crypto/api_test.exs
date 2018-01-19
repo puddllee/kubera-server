@@ -1,11 +1,11 @@
-defmodule Kubera.Crypto.Apitest do
+defmodule Kubera.Crypto.ApiTest do
   use Kubera.DataCase
 
   alias Kubera.Crypto.Api
 
   describe "api" do
     test "fetch_coins/0 gets a list of coin data" do
-      coins = Api.fetch_coins()
+      {:ok, coins} = Api.fetch_coins()
       assert (Enum.count coins) > 0
     end
 

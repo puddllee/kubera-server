@@ -43,7 +43,7 @@ defmodule Kubera.Crypto do
   def get_coin_by_symbol(symbol) do
     case Repo.get_by(Coin, symbol: symbol) do
       %Coin{} = coin -> {:ok, coin}
-      _ -> {:error, nil}
+      _ -> {:error, :not_found}
     end
   end
 
@@ -122,16 +122,22 @@ defmodule Kubera.Crypto do
   end
 
   def save_coinlist do
-    Api.fetch_coins
-    |> Enum.map(&upsert_coin/1)
+    case Api.fetch_coins do
+      {:ok, coins} -> Enum.map(coins, &upsert_coin/1)
+      {:error, reason} -> IO.inspect reason
+    end
   end
 
   def fetch_history(freq, symbol, opts \\ []) do
-    case Api.fetch_history(freq, symbol) do
-      {:ok, data} -> {:ok, data}
-      {:error, :timeout} -> {:error, "timeout"}
-      _ ->
-        {:error, "unknown_error"}
+    with {:ok, _} <- get_coin_by_symbol(symbol),
+         {:ok, data} <- Api.fetch_history(freq, symbol)
+      do
+         {:ok, data}
+      else
+        err -> case err do
+                 {:error, reason} -> {:error, reason}
+                 _ -> {:error, :unknown_error}
+               end
     end
   end
 end
