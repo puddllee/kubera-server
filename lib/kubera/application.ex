@@ -14,7 +14,9 @@ defmodule Kubera.Application do
       supervisor(KuberaWeb.Endpoint, []),
       # Start your own worker by calling: Kubera.Worker.start_link(arg1, arg2, arg3)
       # worker(Kubera.Worker, [arg1, arg2, arg3]),
-      worker(Kubera.Crypto.Scheduler, [])
+      worker(Kubera.Crypto.Scheduler, []),
+      # Start the Cachex cache
+      worker(Cachex, [:coin_cache, []])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

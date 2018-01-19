@@ -140,4 +140,59 @@ defmodule Kubera.Crypto do
                end
     end
   end
+
+  def fetch_all_sparklines do
+    list_coins
+    |> Enum.map(fn c -> Map.get(c, :symbol) end)
+    |> Enum.map(fn s -> fetch_coin_sparkline(s) end)
+    |> Enum.filter(&ok?/1)
+    |> Enum.reduce(%{}, fn({:ok, spark}, acc) ->
+      Map.put(acc, Map.get(spark, :symbol), Map.get(spark, :prices))
+    end)
+  end
+
+  def fetch_coin_sparkline(symbol) do
+    case fetch_history("7day", symbol) do
+      {:ok, history} ->
+        history = history
+        # |> filter_history_within_days(3)
+        |> sparsify(25)
+        {:ok, %{symbol: symbol, prices: history}}
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  def filter_history_within_days(history, days) do
+    days_ago = Timex.now
+    |> Timex.shift(days: days * -1)
+    |> DateTime.to_unix
+
+    IO.inspect days_ago
+
+    history
+    |> Enum.filter(fn h ->
+      Map.get(h, "ts") >= days_ago
+    end)
+  end
+
+  def ok?({:ok, _}), do: true
+  def ok?(_), do: false
+
+  def sparsify(list, max_count) do
+    cond do
+      Enum.count(list) <= max_count -> list
+      true ->
+        step = Enum.count(list) / max_count
+        sparsify_recur([], list, 1, step, step)
+    end
+  end
+
+  defp sparsify_recur(l1, [], _, _, _), do: Enum.reverse(l1)
+  defp sparsify_recur(l1, [x | xs], i, n, step) when i >= n do
+    sparsify_recur([x | l1], xs, i + 1, n + step, step)
+  end
+  defp sparsify_recur(l1, [x | xs], i, n, step) do
+    sparsify_recur(l1, xs, i + 1, n, step)
+  end
 end

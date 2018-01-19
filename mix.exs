@@ -20,7 +20,7 @@ defmodule Kubera.Mixfile do
   def application do
     [
       mod: {Kubera.Application, []},
-      extra_applications: [:logger, :runtime_tools, :timex, :httpoison]
+      extra_applications: [:logger, :runtime_tools, :timex, :httpoison, :cachex]
     ]
   end
 
@@ -49,7 +49,8 @@ defmodule Kubera.Mixfile do
       {:poison, "~> 3.1"},
       {:httpoison, "~> 0.13"},
       {:hashids, "~> 2.0"},
-      {:cors_plug, "~> 1.2"}
+      {:cors_plug, "~> 1.2"},
+      {:cachex, "~> 2.1"}
     ]
   end
 

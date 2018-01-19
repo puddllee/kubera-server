@@ -80,23 +80,24 @@ defmodule Kubera.Crypto.Api do
   def fetch_history(freq, symbol, opts \\ []) do
     case HTTPoison.get(@coincap <> "history/" <> freq <> "/" <> symbol) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        decoded = Poison.decode!(body)
+        case Poison.decode(body) do
+          {:ok, %{"price" => price,
+            "market_cap" => market_cap,
+            "volume" => volume}} ->
 
-        price = Map.get(decoded, "price")
-        market_cap = Map.get(decoded, "market_cap")
-        volume = Map.get(decoded, "volume")
-
-        history = [price, market_cap, volume]
-        |> Enum.zip
-        |> Enum.map(fn d ->
-          {[ts, price], [_, mc], [_, v]} = d
-          %{"ts" => ts,
-            "price" => price,
-            "market_cap" => mc,
-            "volume" => div(v, 1000)}
-        end)
-
-        {:ok, history}
+            history = [price, market_cap, volume]
+            |> Enum.zip
+            |> Enum.map(fn d ->
+              {[ts, price], [_, mc], [_, v]} = d
+              %{"ts" => div(ts, 1000),
+                "price" => price,
+                "market_cap" => mc,
+                "volume" => 1000}
+            end)
+            {:ok, history}
+          _ ->
+            {:error, "Error decoding history"}
+        end
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end
