@@ -94,5 +94,12 @@ defmodule Kubera.CryptoTest do
         assert (Enum.count history) > 1
       end)
     end
+
+    test "sparsify sparses a list" do
+      l = [1,2,3,4,5,6,7,8,9,10]
+      sl = Crypto.sparsify(l, 4)
+      assert Enum.count(sl) <= 4
+      assert sl == [3, 5, 8, 10]
+    end
   end
 end
