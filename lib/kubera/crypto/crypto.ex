@@ -9,6 +9,17 @@ defmodule Kubera.Crypto do
   alias Kubera.Crypto.Coin
   alias Kubera.Crypto.Api
 
+  def history_cache_ttl do
+    %{
+      "1day" => 5 * 60 * 1000, # 5 minutes
+      "7day" => 60 * 60 * 1000, # 60 minutes
+      "30day" => 6 * 60 * 60 * 1000, # 6 hours
+      "90day" => 1 * 24 * 60 * 60 * 1000, # 1 day
+      "180day" => 6 * 24 * 60 * 60 * 1000, # 6 days
+      "365day" => 7 * 24 * 60 * 60 * 1000, # 7 days
+    }
+  end
+
   @doc """
   Returns the list of coins.
 
@@ -128,7 +139,24 @@ defmodule Kubera.Crypto do
     end
   end
 
-  def fetch_history(freq, symbol, opts \\ []) do
+  def fetch_history(freq, symbol) do
+    key = "HIST_#{symbol}_#{freq}"
+    ttl = Map.get(history_cache_ttl(), freq, 5 * 60 * 1000)
+    case Cachex.get(:coin_cache, key) do
+      {:ok, history} ->
+        {:ok, :hit, history}
+      {:missing, _} ->
+        case fetch_history_from_api(freq, symbol) do
+          {:ok, history} ->
+            Cachex.set(:coin_cache, key, history, ttl: ttl)
+            {:ok, :miss, history}
+          err ->
+            err
+        end
+    end
+  end
+
+  def fetch_history_from_api(freq, symbol) do
     with {:ok, _} <- get_coin_by_symbol(symbol),
          {:ok, data} <- Api.fetch_history(freq, symbol)
       do
@@ -192,7 +220,7 @@ defmodule Kubera.Crypto do
   defp sparsify_recur(l1, [x | xs], i, n, step) when i >= n do
     sparsify_recur([x | l1], xs, i + 1, n + step, step)
   end
-  defp sparsify_recur(l1, [x | xs], i, n, step) do
+  defp sparsify_recur(l1, [_ | xs], i, n, step) do
     sparsify_recur(l1, xs, i + 1, n, step)
   end
 end
