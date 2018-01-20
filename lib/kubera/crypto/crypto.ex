@@ -170,7 +170,7 @@ defmodule Kubera.Crypto do
   end
 
   def fetch_all_sparklines do
-    list_coins
+    list_coins()
     |> Enum.map(fn c -> Map.get(c, :symbol) end)
     |> Enum.map(fn s -> fetch_coin_sparkline(s) end)
     |> Enum.filter(&ok?/1)

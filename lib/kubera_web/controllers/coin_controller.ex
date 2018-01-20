@@ -21,14 +21,14 @@ defmodule KuberaWeb.CoinController do
     end
   end
 
-  def price(conn, %{"freq" => freq, "symbol" => symbol} = params) do
+  def price(conn, %{"freq" => freq, "symbol" => symbol}) do
     case Crypto.fetch_history(freq, symbol) do
-      {:ok, data} ->
+      {:ok, _, data} ->
         render(conn, "price.json", symbol: symbol, data: data)
       {:error, :not_found} ->
         send_error(conn, 404)
       {:error, reason} ->
-        send_error(conn, 503, reason)
+        send_error(conn, 400, reason)
     end
   end
   def price(conn, _) do

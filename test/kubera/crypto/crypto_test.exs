@@ -4,6 +4,8 @@ defmodule Kubera.CryptoTest do
   alias Kubera.Crypto
 
   describe "coins" do
+    setup [:clear_coin_cache]
+
     alias Kubera.Crypto.Coin
 
     @valid_attrs %{
@@ -90,7 +92,7 @@ defmodule Kubera.CryptoTest do
       Crypto.save_coinlist()
       ["1day", "7day", "30day", "90day", "180day", "365day"]
       |> Enum.map(fn freq ->
-        {:ok, history} = Crypto.fetch_history(freq, "ETH")
+        {:ok, :miss, history} = Crypto.fetch_history(freq, "ETH")
         assert (Enum.count history) > 1
       end)
     end
@@ -101,5 +103,30 @@ defmodule Kubera.CryptoTest do
       assert Enum.count(sl) <= 4
       assert sl == [3, 5, 8, 10]
     end
+  end
+
+  describe "coin cache" do
+    setup [:clear_coin_cache, :populate_coins]
+
+    test "fetch_history/3 caches coin history for symbol and frequency" do
+      {:ok, :miss, hist1} = Crypto.fetch_history("1day", "ETH")
+      {:ok, :hit, hist2} = Crypto.fetch_history("1day", "ETH")
+      assert hist1 == hist2
+    end
+
+    test "fetch_history/3 does not cache history for same symbol different frequency" do
+      {:ok, :miss, _} = Crypto.fetch_history("1day", "ETH")
+      {:ok, :miss, _} = Crypto.fetch_history("7day", "ETH")
+    end
+  end
+
+  defp clear_coin_cache(_) do
+    Cachex.clear(:coin_cache)
+    :ok
+  end
+
+  defp populate_coins(_) do
+    Crypto.save_coinlist()
+    :ok
   end
 end
