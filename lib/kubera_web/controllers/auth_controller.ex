@@ -1,11 +1,10 @@
 defmodule KuberaWeb.AuthController do
   use KuberaWeb, :controller
 
-  alias Kubera.Accounts
   alias Kubera.Accounts.User
   alias Kubera.Repo
 
-  alias Ueberauth.Strategy.Helpers
+  # alias Ueberauth.Strategy.Helpers
   import KuberaWeb.ErrorView
 
   plug Ueberauth

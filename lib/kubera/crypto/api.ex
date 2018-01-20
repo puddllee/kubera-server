@@ -2,9 +2,9 @@ defmodule Kubera.Crypto.Api do
 
   @cryptocompare_base "https://min-api.cryptocompare.com/data/"
   @coinlist "all/coinlist"
-  @histominute "histominute"
-  @histohour "histohour"
-  @histoday "histoday"
+  # @histominute "histominute"
+  # @histohour "histohour"
+  # @histoday "histoday"
 
   @coinmarketcap "https://api.coinmarketcap.com/v1/ticker/"
 
@@ -77,7 +77,7 @@ defmodule Kubera.Crypto.Api do
     end
   end
 
-  def fetch_history(freq, symbol, opts \\ []) do
+  def fetch_history(freq, symbol) do
     case HTTPoison.get(@coincap <> "history/" <> freq <> "/" <> symbol) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         case Poison.decode(body) do
@@ -92,7 +92,7 @@ defmodule Kubera.Crypto.Api do
               %{"ts" => div(ts, 1000),
                 "price" => price,
                 "market_cap" => mc,
-                "volume" => 1000}
+                "volume" => v}
             end)
             {:ok, history}
           _ ->
