@@ -35,4 +35,13 @@ defmodule KuberaWeb.CoinController do
    send_error(conn, 400)
   end
 
+  def sparklines(conn, _params) do
+    case Crypto.fetch_all_sparklines do
+      {:ok, lines} ->
+        render(conn, "sparklines.json", sparklines: lines)
+      {:error, _} ->
+        send_error(conn, 404)
+    end
+  end
+
 end

@@ -18,7 +18,7 @@ defmodule Kubera.Crypto.Api do
       do
         {:ok, filter_coins_by_symbollist(coins, symbollist)}
       else
-        err -> {:error, err}
+        err -> err
       end
   end
 

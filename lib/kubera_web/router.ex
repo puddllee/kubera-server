@@ -12,6 +12,7 @@ defmodule KuberaWeb.Router do
 
     get "/coins", CoinController, :index
     get "/coins/history/:freq/:symbol", CoinController, :price
+    get "/coins/sparklines", CoinController, :sparklines
     get "/coins/:symbol", CoinController, :show
   end
 

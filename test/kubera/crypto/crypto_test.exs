@@ -92,9 +92,16 @@ defmodule Kubera.CryptoTest do
       Crypto.save_coinlist()
       ["1day", "7day", "30day", "90day", "180day", "365day"]
       |> Enum.map(fn freq ->
-        {:ok, :miss, history} = Crypto.fetch_history(freq, "ETH")
+        {:ok, _, history} = Crypto.fetch_history(freq, "ETH")
         assert (Enum.count history) > 1
       end)
+    end
+
+    test "fetch_coin_sparklines/1 returns sparklines for single coin" do
+      Crypto.save_coinlist()
+      {:ok, %{symbol: symbol, prices: history}} = Crypto.fetch_coin_sparkline("ETH")
+      assert symbol == "ETH"
+      assert Enum.count(history) > 0
     end
 
     test "sparsify sparses a list" do

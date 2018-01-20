@@ -170,18 +170,30 @@ defmodule Kubera.Crypto do
   end
 
   def fetch_all_sparklines do
-    list_coins()
+    case Cachex.get(:coin_cache, :sparklines) do
+      {:ok, sparklines} ->
+        {:ok, sparklines}
+      {:missing, _} ->
+        spawn fn -> fetch_and_cache_all_sparklines() end
+        {:error, :not_found}
+    end
+  end
+
+  def fetch_and_cache_all_sparklines do
+    sparklines = list_coins()
     |> Enum.map(fn c -> Map.get(c, :symbol) end)
     |> Enum.map(fn s -> fetch_coin_sparkline(s) end)
     |> Enum.filter(&ok?/1)
     |> Enum.reduce(%{}, fn({:ok, spark}, acc) ->
       Map.put(acc, Map.get(spark, :symbol), Map.get(spark, :prices))
     end)
+
+    Cachex.set(:coin_cache, :sparklines, sparklines)
   end
 
   def fetch_coin_sparkline(symbol) do
     case fetch_history("7day", symbol) do
-      {:ok, history} ->
+      {:ok, _, history} ->
         history = history
         # |> filter_history_within_days(3)
         |> sparsify(25)

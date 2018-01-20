@@ -14,11 +14,14 @@ defmodule KuberaWeb.CoinView do
     %{symbol: symbol, data: data}
   end
 
+  def render("sparklines.json", %{sparklines: sparklines}) do
+    sparklines
+  end
+
   def render("coin.json", %{coin: coin}) do
     # Map.from_struct coin
     coin
     |> Map.from_struct
     |> Map.drop([:__meta__, :updated_at, :inserted_at])
   end
-
 end

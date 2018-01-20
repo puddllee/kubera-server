@@ -20,7 +20,8 @@ config :kubera, KuberaWeb.Endpoint,
 
 config :kubera, Kubera.Crypto.Scheduler,
   jobs: [
-    {"*/15 * * * *", {Kubera.Crypto, :save_coinlist, []}}
+    {"*/10 * * * *", {Kubera.Crypto, :save_coinlist, []}},
+    {"*/10 * * * *", {Kubera.Crypto, :fetch_and_cache_all_sparklines, []}}
   ]
 
 # Configures Elixir's Logger
